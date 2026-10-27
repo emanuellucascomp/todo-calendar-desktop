@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.validation-dist/
+src-tauri/target/
+src-tauri/calendar-core/target/
+src-tauri/gen/
+.npm-cache/
+.test-data/
+*.db
+*.db-shm
+*.db-wal
+__pycache__/
+*.log
+.env.local
