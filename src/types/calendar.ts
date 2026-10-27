@@ -1,5 +1,5 @@
 export type EntryKind = 'task' | 'event';
-export type CalendarView = 'week' | 'month' | 'year';
+export type CalendarView = 'week' | 'week-grid' | 'month' | 'year';
 export type Priority = 'low' | 'medium' | 'high';
 
 export interface Category {

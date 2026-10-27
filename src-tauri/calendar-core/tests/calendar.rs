@@ -838,6 +838,10 @@ fn settings_are_validated_and_persisted() {
             .await
             .unwrap();
         assert!(!settings.autostart);
+        assert_eq!(settings.calendar_text_color, None);
+        assert_eq!(settings.calendar_background_color, None);
+        settings.calendar_text_color = Some("#abcDEF".into());
+        settings.calendar_background_color = Some("#102030".into());
         settings.theme = "dark".into();
         settings.first_day = 1;
         settings.default_view = "year".into();
@@ -856,6 +860,22 @@ fn settings_are_validated_and_persisted() {
                 .await
                 .unwrap();
         assert_eq!(last, "\"year\"");
+        settings.default_view = "week-grid".into();
+        todo_calendar_core::settings::save(&repo.pool, &settings).await.unwrap();
+        assert_eq!(todo_calendar_core::settings::load(&repo.pool).await.unwrap(), settings);
+        let backup = repo.export_backup().await.unwrap();
+        backup.validate().unwrap();
+        let last: String = sqlx::query_scalar("SELECT value FROM app_settings WHERE key='last_view'")
+            .fetch_one(&repo.pool).await.unwrap();
+        assert_eq!(last, "\"week-grid\"");
+        for color in ["red", "#fff", "#12345g", "#é1234"] {
+            settings.calendar_text_color = Some(color.into());
+            assert!(todo_calendar_core::settings::save(&repo.pool, &settings).await.is_err());
+        }
+        settings.calendar_text_color = None;
+        settings.calendar_background_color = None;
+        todo_calendar_core::settings::save(&repo.pool, &settings).await.unwrap();
+        assert_eq!(todo_calendar_core::settings::load(&repo.pool).await.unwrap(), settings);
         settings.first_day = 7;
         assert!(todo_calendar_core::settings::save(&repo.pool, &settings)
             .await

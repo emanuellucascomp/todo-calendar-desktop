@@ -191,3 +191,22 @@ input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* O mesmo botão permanece montado para preservar o foco ao alternar. */
+.app-shell { position: relative; }
+.app-header { padding-right: 70px; }
+.minimal-toggle { position: absolute; z-index: 30; top: 21px; right: 14px; background: var(--surface); }
+.minimal-mode .minimal-toggle { top: 8px; right: 8px; box-shadow: 0 2px 8px #0002; }
+.minimal-mode .calendar-caption, .minimal-mode .calendar-footer { display: none; }
+.minimal-mode .calendar-main { padding: 0; }
+.minimal-mode .calendar-surface { border: 0; border-radius: 0; }
+.minimal-mode .calendar-surface .fc-col-header-cell:last-child { padding-right: 48px; }
+.minimal-mode .year-calendar { padding-top: 56px; }
+.calendar-surface { background: var(--surface); color: var(--foreground); }
+.calendar-surface.custom-calendar-background { background: var(--calendar-custom-background); --border: color-mix(in srgb, var(--foreground) 20%, var(--surface)); --muted: color-mix(in srgb, var(--foreground) 8%, var(--surface)); }
+.calendar-surface.custom-calendar-background .fc { --fc-page-bg-color: var(--surface); --fc-neutral-bg-color: var(--muted); --fc-today-bg-color: color-mix(in srgb, var(--primary) 8%, var(--surface)); --fc-border-color: var(--border); }
+.calendar-surface .year-day-selected:not(.year-day-today) { color: var(--foreground); background: color-mix(in srgb, var(--primary) 15%, var(--surface)); }
+.calendar-surface .fc .fc-daygrid-more-link { color: var(--foreground); }
+.calendar-color-preview { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; }
+.calendar-color-preview strong { font-size: 26px; }
+.form-field input[type=color] { height: 44px; padding: 4px; cursor: pointer; }

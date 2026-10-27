@@ -40,11 +40,12 @@ export function calendarRange(date: Date, view: CalendarView, firstDay: 0 | 1): 
   if (view === 'year') return {
     start: new Date(date.getFullYear(), 0, 1), end: new Date(date.getFullYear() + 1, 0, 1),
   };
-  const anchor = view === 'week' ? date : new Date(date.getFullYear(), date.getMonth(), 1, 12);
+  const weekly = view === 'week' || view === 'week-grid';
+  const anchor = weekly ? date : new Date(date.getFullYear(), date.getMonth(), 1, 12);
   const first = startOfCivilWeek(anchor, firstDay);
   return {
     start: new Date(first.getFullYear(), first.getMonth(), first.getDate()),
-    end: new Date(first.getFullYear(), first.getMonth(), first.getDate() + (view === 'week' ? 7 : 42)),
+    end: new Date(first.getFullYear(), first.getMonth(), first.getDate() + (weekly ? 7 : 42)),
   };
 }
 

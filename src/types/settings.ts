@@ -1,10 +1,12 @@
 import type { CalendarView } from './calendar';
 export interface AppPreferences {
+  calendar_text_color: string | null; calendar_background_color: string | null;
   theme: 'light' | 'dark' | 'system'; first_day: 0 | 1; default_view: CalendarView; show_completed: boolean;
   notifications_enabled: boolean; default_reminder_minutes: number; autostart: boolean;
   minimize_to_tray: boolean; close_behavior: 'exit' | 'tray';
 }
 export const DEFAULT_PREFERENCES: AppPreferences = {
+  calendar_text_color: null, calendar_background_color: null,
   theme: 'system', first_day: 0, default_view: 'month', show_completed: true,
   notifications_enabled: true, default_reminder_minutes: 10, autostart: false,
   minimize_to_tray: false, close_behavior: 'exit',

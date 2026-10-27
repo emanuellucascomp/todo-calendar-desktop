@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertCircle, Database, RefreshCw } from 'lucide-react';
+import { AlertCircle, Database, Minimize2, Maximize2, RefreshCw } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Sidebar } from '@/components/layout/sidebar';
 import { CalendarWorkspace } from '@/components/calendar/calendar-workspace';
@@ -16,6 +16,8 @@ import { useAppearance } from '@/hooks/use-appearance';
 export function App() {
   const { state, retry, refreshMetadata, toggleCompleted, saving, saveError } = useFoundation();
   const sidebarOpen = useCalendarStore((store) => store.sidebarOpen);
+  const minimalMode = useCalendarStore((store) => store.minimalMode);
+  const toggleMinimalMode = useCalendarStore((store) => store.toggleMinimalMode);
   const editorRequest = useCalendarStore((store) => store.editorRequest);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const ready = state.status === 'ready';
@@ -25,11 +27,14 @@ export function App() {
   useAppearance();
   useEffect(() => { if (ready) void usePreferencesStore.getState().load(); }, [ready]);
   return (
-    <div className="app-shell">
+    <div className={`app-shell${minimalMode ? ' minimal-mode' : ''}`}>
       <a className="skip-link" href="#calendar">Ir para o calendário</a>
-      <Header onSettings={() => setSettingsOpen(true)} firstDay={ready ? state.settings.firstDay : 0} loading={state.status === 'loading'} />
+      <Button variant="outline" size="icon" className="minimal-toggle" aria-label={minimalMode ? 'Mostrar interface completa' : 'Ocultar cabeçalho e focar no calendário'} title={minimalMode ? 'Mostrar interface completa' : 'Modo minimalista'} aria-pressed={minimalMode} onClick={toggleMinimalMode}>
+        {minimalMode ? <Minimize2 /> : <Maximize2 />}
+      </Button>
+      {!minimalMode && <Header onSettings={() => setSettingsOpen(true)} firstDay={ready ? state.settings.firstDay : 0} loading={state.status === 'loading'} />}
       <div className="app-body">
-        {sidebarOpen && <Sidebar categories={ready ? state.categories : []} firstDay={ready ? state.settings.firstDay : 0}
+        {sidebarOpen && !minimalMode && <Sidebar categories={ready ? state.categories : []} firstDay={ready ? state.settings.firstDay : 0}
           ready={ready} showCompleted={ready ? state.settings.showCompleted : true} saving={saving} toggleCompleted={() => { void toggleCompleted(); }} />}
         <main id="calendar" tabIndex={-1} className="calendar-main" aria-label="Calendário de tarefas e eventos">
           {state.status === 'error' && <div role="alert" className="database-alert">

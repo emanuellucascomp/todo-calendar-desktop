@@ -153,3 +153,10 @@ npm.cmd run desktop:build
 O Tauri executa o typecheck/build do frontend e compila o aplicativo nativo. A configuração solicita instalador **NSIS** em português brasileiro, nome **Todo Calendar**, identificador `br.com.todocalendar.desktop` e ícone original. O instalador deve aparecer em `src-tauri/target/release/bundle/nsis/`. Essa saída ainda não foi produzida neste ambiente. Veja a [documentação de instaladores Windows](https://v2.tauri.app/distribute/windows-installer/).
 
 Os ícones PNG/ICO são reproduzíveis com `python scripts/generate-icon.py`. Não há assinatura de produção nem atualização automática remota configurada.
+
+### Aparência do calendário
+
+- No seletor de visualização, **Semana com horários** mantém a agenda por hora; **Semana em grade** mostra apenas os sete dias, no estilo da visão mensal, sem a escala de horários. As duas opções preservam a data e os filtros, lembram a última escolha e podem ser definidas como padrão nas configurações.
+- Use o botão **Modo minimalista** no canto superior direito para ocultar o cabeçalho, a lateral e os textos auxiliares. O mesmo botão restaura a interface, mantendo a data, a visualização e os filtros. Esse modo vale para a sessão atual.
+- Em **Configurações → Aparência → Cores do calendário**, escolha as cores do texto e do fundo, confira a prévia e clique em **Salvar configurações**. As cores são salvas no SQLite e aplicadas às visões de mês, semana e ano. As categorias mantêm suas próprias cores.
+- **Restaurar cores do tema** volta às cores do tema claro, escuro ou do sistema após salvar.

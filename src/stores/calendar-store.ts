@@ -14,6 +14,8 @@ interface CalendarState {
   setCategoriesOpen: (open: boolean) => void;
   view: CalendarView;
   sidebarOpen: boolean;
+  minimalMode: boolean;
+  toggleMinimalMode: () => void;
   visibleKinds: EntryKind[];
   hiddenCategoryIds: string[];
   selectDate: (date: Date) => void;
@@ -36,6 +38,8 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   setCategoriesOpen: (categoriesOpen) => set({ categoriesOpen }),
   view: 'month',
   sidebarOpen: true,
+  minimalMode: false,
+  toggleMinimalMode: () => set((state) => ({ minimalMode: !state.minimalMode })),
   visibleKinds: ['task', 'event'],
   hiddenCategoryIds: [],
   selectDate: (date) => set({ selectedDate: date }),

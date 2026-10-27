@@ -7,7 +7,7 @@ import type { CalendarView } from '@/types/calendar';
 export function Header({ onSettings, firstDay, loading }: { onSettings: () => void; firstDay: 0 | 1; loading: boolean }) {
   const { selectedDate, view, setView, navigate, today, toggleSidebar, sidebarOpen } = useCalendarStore();
   const title = periodTitle(selectedDate, view, firstDay);
-  const period = view === 'week' ? 'semana' : view === 'year' ? 'ano' : 'mês';
+  const period = view === 'week' || view === 'week-grid' ? 'semana' : view === 'year' ? 'ano' : 'mês';
   return (
     <header className="app-header">
       <Button variant="ghost" size="icon" aria-label={sidebarOpen ? 'Recolher barra lateral' : 'Expandir barra lateral'} aria-expanded={sidebarOpen} aria-controls="sidebar" onClick={toggleSidebar}><Menu /></Button>
@@ -21,7 +21,8 @@ export function Header({ onSettings, firstDay, loading }: { onSettings: () => vo
       <label className="view-select">
         <span className="sr-only">Visualização do calendário</span>
         <select value={view} disabled={loading} aria-label="Visualização do calendário" onChange={(event) => setView(event.target.value as CalendarView)}>
-          <option value="week">Semana</option>
+          <option value="week">Semana com horários</option>
+          <option value="week-grid">Semana em grade</option>
           <option value="month">Mês</option>
           <option value="year">Ano</option>
         </select>

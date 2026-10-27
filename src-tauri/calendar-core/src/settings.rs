@@ -6,6 +6,8 @@ use sqlx::SqlitePool;
 #[serde(default)]
 pub struct Preferences {
     pub theme: String,
+    pub calendar_text_color: Option<String>,
+    pub calendar_background_color: Option<String>,
     pub first_day: i64,
     pub default_view: String,
     pub show_completed: bool,
@@ -19,6 +21,8 @@ impl Default for Preferences {
     fn default() -> Self {
         Self {
             theme: "system".into(),
+            calendar_text_color: None,
+            calendar_background_color: None,
             first_day: 0,
             default_view: "month".into(),
             show_completed: true,
@@ -32,9 +36,20 @@ impl Default for Preferences {
 }
 impl Preferences {
     pub fn validate(&self) -> Result<()> {
+        for color in [&self.calendar_text_color, &self.calendar_background_color]
+            .into_iter()
+            .flatten()
+        {
+            if color.len() != 7
+                || !color.starts_with('#')
+                || !color.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit)
+            {
+                return Err("Cor inválida. Use # seguido de seis dígitos hexadecimais.".into());
+            }
+        }
         if !["light", "dark", "system"].contains(&self.theme.as_str())
             || ![0, 1].contains(&self.first_day)
-            || !["month", "week", "year"].contains(&self.default_view.as_str())
+            || !["month", "week", "week-grid", "year"].contains(&self.default_view.as_str())
             || !["exit", "tray"].contains(&self.close_behavior.as_str())
             || !(0..=525_600).contains(&self.default_reminder_minutes)
         {

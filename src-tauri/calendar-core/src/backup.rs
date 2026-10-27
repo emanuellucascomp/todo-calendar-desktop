@@ -215,7 +215,7 @@ impl Backup {
             if row.key == "last_view"
                 && !value
                     .as_str()
-                    .is_some_and(|v| ["month", "week", "year"].contains(&v))
+                    .is_some_and(|v| ["month", "week", "week-grid", "year"].contains(&v))
             {
                 return Err("Visualização inválida no backup.".into());
             }

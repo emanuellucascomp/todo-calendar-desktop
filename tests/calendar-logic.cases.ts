@@ -14,6 +14,18 @@ export function entry(overrides: Partial<CalendarEntry> = {}): CalendarEntry {
 }
 
 export const calendarCases: { name: string; run: () => void }[] = [
+  { name: 'semana em grade usa os mesmos sete dias da semana com horários', run() {
+    for (const firstDay of [0, 1] as const) {
+      for (const date of [new Date(2026, 11, 31), new Date(2026, 10, 1), new Date(2024, 1, 29)]) {
+        const grid = calendarRange(date, 'week-grid', firstDay);
+        assert.deepEqual(grid, calendarRange(date, 'week', firstDay));
+        assert.equal(grid.start.getDay(), firstDay);
+        for (const direction of [-1, 1] as const) {
+          assert.equal(dateKey(navigatePeriod(date, 'week-grid', direction)), dateKey(navigatePeriod(date, 'week', direction)));
+        }
+      }
+    }
+  } },
   { name: 'navega uma semana incluindo mudança de mês e ano', run() {
     assert.equal(dateKey(navigatePeriod(new Date(2026, 11, 29), 'week', 1)), '2027-01-05');
     assert.equal(dateKey(navigatePeriod(new Date(2027, 0, 3), 'week', -1)), '2026-12-27');

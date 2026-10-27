@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { CalendarColors } from '@/components/calendar/calendar-colors';
 import { preferencesSchema } from './schema';
 import { exportBackup, getPreferences, hideToTray, importBackup, previewBackup, runtimeStatus, savePreferences, testNotification } from '@/services/settings-api';
 import { usePreferencesStore } from '@/stores/preferences-store';
@@ -37,10 +38,13 @@ export function SettingsDialog({ open, onOpenChange, databasePath, onSaved }: { 
     {error&&<p role="alert" className="form-error">{error}</p>}{message&&<p role="status" className="settings-message">{message}</p>}
     {loading&&<p role="status" className="mt-4 text-sm">Carregando configurações…</p>}
     <form className="entry-form" onSubmit={(event)=>{void submit(event);}} noValidate><fieldset disabled={loading||busy||!loaded||!databasePath}>
-      <section className="form-section"><h3>Aparência</h3><label className="form-field">Tema<select {...register('theme')}><option value="light">Claro</option><option value="dark">Escuro</option><option value="system">Seguir tema do sistema</option></select></label></section>
+      <section className="form-section"><h3>Aparência</h3><label className="form-field">Tema<select {...register('theme')}><option value="light">Claro</option><option value="dark">Escuro</option><option value="system">Seguir tema do sistema</option></select></label>
+        <CalendarColors text={form.watch('calendar_text_color')} background={form.watch('calendar_background_color')} onChange={(field, value) => form.setValue(field, value, { shouldDirty: true, shouldValidate: true })} />
+        {(errors.calendar_text_color || errors.calendar_background_color) && <p role="alert" className="field-error">Selecione uma cor válida.</p>}
+      </section>
       <section className="form-section"><h3>Calendário</h3><div className="form-grid">
         <label className="form-field">Primeiro dia da semana<select {...register('first_day',{valueAsNumber:true})}><option value={0}>Domingo</option><option value={1}>Segunda-feira</option></select></label>
-        <label className="form-field">Visualização padrão<select {...register('default_view')}><option value="month">Mês</option><option value="week">Semana</option><option value="year">Ano</option></select></label>
+        <label className="form-field">Visualização padrão<select {...register('default_view')}><option value="month">Mês</option><option value="week">Semana com horários</option><option value="week-grid">Semana em grade</option><option value="year">Ano</option></select></label>
       </div><label className="form-check"><input type="checkbox" {...register('show_completed')} /> Mostrar tarefas concluídas</label><p className="field-help">O aplicativo lembra a última visualização. Alterar o padrão também seleciona essa visualização agora.</p></section>
       <section className="form-section"><h3>Notificações</h3><label className="form-check"><input type="checkbox" {...register('notifications_enabled')} /> Ativar lembretes</label>
         <label className="form-field">Antecedência padrão (minutos)<input type="number" min={0} max={525_600} {...register('default_reminder_minutes',{valueAsNumber:true})}/>{errors.default_reminder_minutes&&<span className="field-error" role="alert">{errors.default_reminder_minutes.message}</span>}</label>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { RefreshCw } from 'lucide-react';
 import type { Category } from '@/types/calendar';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,17 @@ import { YearCalendar } from './year-calendar';
 import { SelectionDialog, type CalendarSelection } from './selection-dialog';
 import { completeEntry } from '@/services/entry-actions';
 import type { CalendarEntry } from '@/types/calendar';
+import { usePreferencesStore } from '@/stores/preferences-store';
 
 export function CalendarWorkspace({ ready, firstDay, showCompleted, categories }: {
   ready: boolean; firstDay: 0 | 1; showCompleted: boolean; categories: Category[];
 }) {
   const view = useCalendarStore((state) => state.view);
+  const { calendar_text_color: text, calendar_background_color: background } = usePreferencesStore((state) => state.preferences);
+  const colors = {
+    ...(text ? { '--foreground': text, '--muted-foreground': text } : {}),
+    ...(background ? { '--surface': background, '--calendar-custom-background': background } : {}),
+  } as CSSProperties;
   const query = useCalendarData(ready, firstDay, showCompleted);
   const [selection, setSelection] = useState<CalendarSelection | null>(null);
   const [saving, setSaving] = useState(false);
@@ -31,7 +37,7 @@ export function CalendarWorkspace({ ready, firstDay, showCompleted, categories }
       <span>Um lugar para organizar seus dias</span>
       <span role="status">{query.loading ? 'Carregando registros…' : view === 'year' ? 'Visão anual' : 'Clique em uma data ou selecione um período'}</span>
     </div>
-    <div className="calendar-surface" aria-busy={query.loading}>
+    <div className={`calendar-surface${background ? ' custom-calendar-background' : ''}`} style={colors} aria-busy={query.loading}>
       {view === 'year' ? <YearCalendar entries={query.entries} firstDay={firstDay} />
         : <ScheduleCalendar firstDay={firstDay} entries={query.entries} categories={categories} onSelect={setSelection} saving={saving} onToggle={(entry) => { void toggle(entry); }} />}
     </div>

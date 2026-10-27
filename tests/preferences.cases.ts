@@ -12,6 +12,13 @@ function driver(rows: { key: string; value: string }[] = []) {
 }
 
 export const preferenceCases: { name: string; run: () => Promise<void> }[] = [
+  { name: 'salva e restaura semana em grade como última visão ou padrão', async run() {
+    const { repository, writes } = driver([{ key: 'last_view', value: '"week-grid"' }]);
+    assert.equal((await repository.loadFoundationSettings()).lastView, 'week-grid');
+    await repository.saveLastView('week-grid');
+    assert.deepEqual(writes, [['last_view', '"week-grid"']]);
+    assert.equal((await driver([{ key: 'default_view', value: '"week-grid"' }]).repository.loadFoundationSettings()).lastView, 'week-grid');
+  } },
   { name: 'restaura a última visão e o primeiro dia salvos', async run() {
     const { repository } = driver([{ key: 'last_view', value: '"year"' }, { key: 'first_day', value: '1' }]);
     assert.deepEqual(await repository.loadFoundationSettings(), { firstDay: 1, lastView: 'year', showCompleted: true });

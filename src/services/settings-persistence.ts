@@ -7,7 +7,7 @@ export interface SettingsConnection {
 }
 
 const firstDaySchema = z.union([z.literal(0), z.literal(1)]);
-const viewSchema = z.enum(['month', 'week', 'year']);
+const viewSchema = z.enum(['month', 'week', 'week-grid', 'year']);
 const UPSERT = "INSERT INTO app_settings (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
 
 // Conexão injetável: produção usa o plugin Tauri; testes exercitam o mesmo repositório.
