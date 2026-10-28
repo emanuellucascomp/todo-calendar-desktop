@@ -52,7 +52,9 @@ export function SettingsDialog({ open, onOpenChange, databasePath, onSaved }: { 
         <p className="field-help">Lembretes funcionam enquanto o aplicativo estiver aberto ou na bandeja. Com o processo totalmente encerrado, não são emitidos. O Windows pode exigir o aplicativo instalado para exibir notificações.</p>
         {status&&<p className="field-help">{status.last_error?`Último erro do agendador: ${status.last_error}`:status.last_check?`Agendador ativo. Última verificação: ${new Date(status.last_check).toLocaleString('pt-BR',{hour12:false})}`:'Agendador iniciando…'}</p>}
       </section>
-      <section className="form-section"><h3>Sistema</h3><label className="form-check"><input type="checkbox" {...register('autostart')} /> Iniciar Todo Calendar com o Windows</label><p className="field-help">Quando ativado, inicia na bandeja. Desativado por padrão.</p>
+      <section className="form-section"><h3>Sistema</h3><label className="form-check"><input type="checkbox" {...register('autostart')} /> Iniciar Manus Calendar com o Windows</label><p className="field-help">Ao entrar na sua conta do Windows, abre o calendário com a data, visualização, filtros e janela da última sessão. Desativado por padrão.</p>
+        <label className="form-check"><input type="checkbox" {...register('start_in_tray')} /> Iniciar minimizado na bandeja ao entrar no Windows</label>
+        <p className="field-help">Deixe esta opção desmarcada para o calendário aparecer aberto. A sessão é restaurada também ao abrir o aplicativo manualmente.</p>
         <label className="form-check"><input type="checkbox" {...register('minimize_to_tray')} /> Minimizar para a bandeja</label>
         <label className="form-field">Ao fechar a janela<select {...register('close_behavior')}><option value="exit">Encerrar completamente</option><option value="tray">Manter ativo na bandeja</option></select></label>
         <Button variant="outline" onClick={()=>{void action(async()=>{await hideToTray();});}}>Minimizar para a bandeja agora</Button>

@@ -406,6 +406,7 @@ fn draft(rule: Option<&str>) -> EntryDraft {
         start_utc: None,
         end_utc: None,
         duration_seconds: None,
+        font_size: 12, bold: false, italic: false, underline: false,
     }
 }
 
@@ -838,10 +839,22 @@ fn settings_are_validated_and_persisted() {
             .await
             .unwrap();
         assert!(!settings.autostart);
+        assert!(!settings.start_in_tray);
+        settings.start_in_tray = true;
         assert_eq!(settings.calendar_text_color, None);
         assert_eq!(settings.calendar_background_color, None);
         settings.calendar_text_color = Some("#abcDEF".into());
         settings.calendar_background_color = Some("#102030".into());
+        assert_eq!(settings.calendar_font_size, 12);
+        settings.calendar_font_size = 18;
+        settings.calendar_bold = true;
+        settings.calendar_italic = true;
+        settings.calendar_underline = true;
+        let mut invalid = settings.clone();
+        for size in [9, 25] {
+            invalid.calendar_font_size = size;
+            assert!(todo_calendar_core::settings::save(&repo.pool, &invalid).await.is_err());
+        }
         settings.theme = "dark".into();
         settings.first_day = 1;
         settings.default_view = "year".into();
@@ -1067,4 +1080,57 @@ fn split_moves_exception_reminders_without_breaking_foreign_keys() {
             .unwrap()
             .is_empty());
     })
+}
+
+#[test]
+fn typography_is_independent_and_survives_scopes_duplicate_and_backup() {
+    run(async {
+        let repo = repo().await;
+        let mut input = draft(Some("FREQ=DAILY;COUNT=5"));
+        input.font_size = 20;
+        input.bold = true;
+        let root = repo.create(&input).await.unwrap();
+        let other = repo.create(&draft(None)).await.unwrap();
+        let mut patch = draft(None);
+        patch.start_date = "2026-11-03".into();
+        patch.italic = true;
+        patch.underline = true;
+        repo.update(&root.id, "2026-11-03", Scope::One, &patch).await.unwrap();
+        let single = repo.details(&root.id, "2026-11-03").await.unwrap().occurrence.entry;
+        assert_eq!(single.font_size, 12);
+        assert!(!single.bold && single.italic && single.underline);
+        let base = repo.details(&root.id, "2026-11-02").await.unwrap().occurrence.entry;
+        assert_eq!(base.font_size, 20);
+        assert!(base.bold && !base.italic);
+        assert_eq!(repo.entry(&other.id).await.unwrap().font_size, 12);
+        let copy = repo.duplicate(&root.id, "2026-11-03").await.unwrap();
+        assert!(copy.italic && copy.underline && !copy.bold);
+        input.font_size = 18;
+        repo.update(&root.id, "2026-11-02", Scope::Series, &input).await.unwrap();
+        assert!(repo.details(&root.id, "2026-11-03").await.unwrap().occurrence.entry.italic);
+        let mut future = input.clone();
+        future.start_date = "2026-11-04".into();
+        future.font_size = 24;
+        future.bold = false;
+        repo.update(&root.id, "2026-11-04", Scope::Future, &future).await.unwrap();
+        let backup = repo.export_backup().await.unwrap();
+        assert_eq!(backup.schema_version, 5);
+        repo.import_backup(&backup).await.unwrap();
+        let occurrences = repo.occurrences("2026-11-02", "2026-11-08").await.unwrap();
+        assert!(occurrences.iter().any(|o| o.entry.start_date == "2026-11-04" && o.entry.font_size == 24 && !o.entry.bold));
+        assert_eq!(repo.entry(&root.id).await.unwrap().font_size, 18);
+        assert!(repo.entry(&copy.id).await.unwrap().underline);
+        for invalid in [9, 25] {
+            input.font_size = invalid;
+            assert!(repo.create(&input).await.is_err());
+        }
+        // Old backups and exception drafts without typography remain readable.
+        let mut legacy = serde_json::to_value(&backup).unwrap();
+        legacy["schema_version"] = 4.into();
+        for entry in legacy["entries"].as_array_mut().unwrap() {
+            for key in ["font_size", "bold", "italic", "underline"] { entry.as_object_mut().unwrap().remove(key); }
+        }
+        let parsed = todo_calendar_core::backup::Backup::parse(&serde_json::to_vec(&legacy).unwrap()).unwrap();
+        assert!(parsed.entries.iter().all(|e| e.font_size == 12 && !e.bold));
+    });
 }

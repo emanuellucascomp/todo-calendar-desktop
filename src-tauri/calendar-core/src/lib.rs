@@ -9,6 +9,7 @@ pub const MIGRATIONS: &[&str] = &[
     include_str!("../../migrations/0002_occurrences.sql"),
     include_str!("../../migrations/0003_delivery_attempts.sql"),
     include_str!("../../migrations/0004_exact_duration.sql"),
+    include_str!("../../migrations/0005_entry_typography.sql"),
 ];
 
 pub type Result<T> = std::result::Result<T, String>;

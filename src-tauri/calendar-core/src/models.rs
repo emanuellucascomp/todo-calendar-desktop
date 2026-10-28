@@ -24,6 +24,15 @@ pub struct Entry {
     pub series_end_before: Option<String>,
     #[serde(default)]
     pub duration_seconds: Option<i64>,
+    #[serde(default = "default_font_size")]
+    pub font_size: i64,
+    #[serde(default)]
+    pub bold: bool,
+    #[serde(default)]
+    pub italic: bool,
+    #[serde(default)]
+    pub underline: bool,
+
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -82,6 +91,15 @@ pub struct EntryDraft {
     pub end_utc: Option<String>,
     #[serde(default)]
     pub duration_seconds: Option<i64>,
+    #[serde(default = "default_font_size")]
+    pub font_size: i64,
+    #[serde(default)]
+    pub bold: bool,
+    #[serde(default)]
+    pub italic: bool,
+    #[serde(default)]
+    pub underline: bool,
+
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -155,8 +173,11 @@ pub fn key_datetime(value: &str) -> Result<NaiveDateTime> {
     }
 }
 
+fn default_font_size() -> i64 { 12 }
+
 impl EntryDraft {
     pub fn validate(&self) -> Result<()> {
+        if !(10..=24).contains(&self.font_size) { return Err("Use um tamanho de fonte entre 10 e 24 px.".into()); }
         let reference_interval = match (&self.start_utc, &self.end_utc) {
             (None, None) => false,
             (Some(start), Some(end)) => {
@@ -271,6 +292,10 @@ impl EntryDraft {
         Ok(())
     }
     pub fn apply(&self, entry: &mut Entry) {
+        entry.font_size = self.font_size;
+        entry.bold = self.bold;
+        entry.italic = self.italic;
+        entry.underline = self.underline;
         entry.kind = self.kind.clone();
         entry.title = self.title.trim().to_owned();
         entry.description = self.description.clone();

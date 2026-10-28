@@ -1,3 +1,4 @@
+import { movedEntryDraft } from '@/features/calendar/move';
 import { invoke } from '@tauri-apps/api/core';
 import type { CalendarEntry, EditScope, EntryDraft, ReminderDraft } from '@/types/calendar';
 import { entryIdentity } from '@/features/entries/form';
@@ -19,4 +20,9 @@ export async function duplicateEntry(entry: CalendarEntry) {
 }
 export async function completeEntry(entry: CalendarEntry) {
   await invoke('complete_entry', { ...entryIdentity(entry), completed: entry.completed === 0 }); useCalendarStore.getState().touch();
+}
+
+export async function moveEntry(entry: CalendarEntry, start: Date, end: Date | null, allDay: boolean) {
+  const details = await getEntryDetails(entry);
+  await saveEntry(entry, movedEntryDraft(details.occurrence, details.reminders, start, end, allDay), 'one');
 }

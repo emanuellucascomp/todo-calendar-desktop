@@ -4,6 +4,7 @@ import { listCategories } from '@/services/categories-repository';
 import { loadFoundationSettings, saveShowCompleted } from '@/services/settings-repository';
 import type { Category, DatabaseInfo, FoundationSettings } from '@/types/calendar';
 import { useCalendarStore } from '@/stores/calendar-store';
+import { restoreSession } from '@/services/session-repository';
 
 type FoundationState =
   | { status: 'loading' }
@@ -31,6 +32,8 @@ export function useFoundation() {
       const info = await invoke<DatabaseInfo>('database_info');
       if (active) {
         useCalendarStore.getState().setView(settings.lastView);
+        await restoreSession();
+        if (!active) return;
         setState({ status: 'ready', categories, settings, databasePath: info.path });
       }
     })().catch((error: unknown) => {

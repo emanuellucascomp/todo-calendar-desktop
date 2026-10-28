@@ -33,12 +33,12 @@ pub async fn export_backup(app: tauri::AppHandle) -> Result<Option<String>> {
         handle
             .dialog()
             .file()
-            .set_title("Exportar backup do Todo Calendar")
+            .set_title("Exportar backup do Manus Calendar")
             .set_file_name(format!(
                 "todo-calendar-{}.json",
                 chrono::Local::now().format("%Y-%m-%d")
             ))
-            .add_filter("Backup Todo Calendar", &["json"])
+            .add_filter("Backup Manus Calendar", &["json"])
             .blocking_save_file()
     })
     .await
@@ -91,7 +91,7 @@ pub async fn preview_backup(app: tauri::AppHandle) -> Result<Option<ImportPrevie
             .dialog()
             .file()
             .set_title("Selecionar backup para importar")
-            .add_filter("Backup Todo Calendar", &["json"])
+            .add_filter("Backup Manus Calendar", &["json"])
             .blocking_pick_file()
     })
     .await

@@ -85,9 +85,9 @@ input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); 
 .fc .fc-daygrid-more-link { color: #185abc; font-size: 11px; }
 .calendar-entry-content { display: flex; align-items: baseline; gap: 4px; min-width: 0; padding: 1px 3px; }
 .calendar-entry-content svg { width: 12px; height: 12px; flex: 0 0 12px; align-self: center; }
-.calendar-entry-time { font-size: 10px; flex-shrink: 0; }
+.calendar-entry-time { font-size: .85em; flex-shrink: 0; }
 .calendar-entry-title { overflow: hidden; text-overflow: ellipsis; }
-.entry-completed .calendar-entry-title { text-decoration: line-through; opacity: .8; }
+.entry-completed .calendar-entry-title { opacity: .8; }
 .fc .fc-timegrid-event .calendar-entry-content { flex-wrap: wrap; align-items: flex-start; }
 .fc .fc-timegrid-event .calendar-entry-title { white-space: normal; overflow-wrap: anywhere; }
 .year-calendar { height: 100%; overflow: auto; padding: 20px clamp(12px, 2vw, 28px) 28px; scrollbar-gutter: stable; }
@@ -210,3 +210,4 @@ input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); 
 .calendar-color-preview { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; }
 .calendar-color-preview strong { font-size: 26px; }
 .form-field input[type=color] { height: 44px; padding: 4px; cursor: pointer; }
+

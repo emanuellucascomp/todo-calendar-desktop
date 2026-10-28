@@ -7,7 +7,7 @@ import { useCalendarData } from '@/hooks/use-calendar-data';
 import { ScheduleCalendar } from './schedule-calendar';
 import { YearCalendar } from './year-calendar';
 import { SelectionDialog, type CalendarSelection } from './selection-dialog';
-import { completeEntry } from '@/services/entry-actions';
+import { completeEntry, moveEntry } from '@/services/entry-actions';
 import type { CalendarEntry } from '@/types/calendar';
 import { usePreferencesStore } from '@/stores/preferences-store';
 
@@ -30,6 +30,14 @@ export function CalendarWorkspace({ ready, firstDay, showCompleted, categories }
     try { await completeEntry(entry); } catch (error) { setActionError(String(error)); } finally { setSaving(false); }
   }
 
+  async function move(entry: CalendarEntry, start: Date, end: Date | null, allDay: boolean) {
+    if (saving || !ready) throw new Error('Aguarde o calendário ficar disponível.');
+    setSaving(true); setActionError(null);
+    try { await moveEntry(entry, start, end, allDay); }
+    catch (error) { setActionError(`Não foi possível mover o registro: ${String(error)}`); throw error; }
+    finally { setSaving(false); }
+  }
+
   return <>
     {actionError && <p role="alert" className="database-alert">{actionError}</p>}
     {query.error && <div role="alert" className="database-alert">{query.error}<Button variant="outline" size="sm" onClick={query.retry}><RefreshCw /> Tentar novamente</Button></div>}
@@ -39,7 +47,7 @@ export function CalendarWorkspace({ ready, firstDay, showCompleted, categories }
     </div>
     <div className={`calendar-surface${background ? ' custom-calendar-background' : ''}`} style={colors} aria-busy={query.loading}>
       {view === 'year' ? <YearCalendar entries={query.entries} firstDay={firstDay} />
-        : <ScheduleCalendar firstDay={firstDay} entries={query.entries} categories={categories} onSelect={setSelection} saving={saving} onToggle={(entry) => { void toggle(entry); }} />}
+        : <ScheduleCalendar firstDay={firstDay} entries={query.entries} categories={categories} onSelect={setSelection} saving={saving || !ready || query.loading} onMove={move} onToggle={(entry) => { void toggle(entry); }} />}
     </div>
     <SelectionDialog selection={selection} onClose={() => setSelection(null)} entries={query.entries} categories={categories}
       loading={query.loading} error={!ready ? 'Conecte o banco local para consultar os registros.' : query.error} />

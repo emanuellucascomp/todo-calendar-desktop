@@ -8,12 +8,17 @@ pub struct Preferences {
     pub theme: String,
     pub calendar_text_color: Option<String>,
     pub calendar_background_color: Option<String>,
+    pub calendar_font_size: i64,
+    pub calendar_bold: bool,
+    pub calendar_italic: bool,
+    pub calendar_underline: bool,
     pub first_day: i64,
     pub default_view: String,
     pub show_completed: bool,
     pub notifications_enabled: bool,
     pub default_reminder_minutes: i64,
     pub autostart: bool,
+    pub start_in_tray: bool,
     pub minimize_to_tray: bool,
     pub close_behavior: String,
 }
@@ -23,12 +28,17 @@ impl Default for Preferences {
             theme: "system".into(),
             calendar_text_color: None,
             calendar_background_color: None,
+            calendar_font_size: 12,
+            calendar_bold: false,
+            calendar_italic: false,
+            calendar_underline: false,
             first_day: 0,
             default_view: "month".into(),
             show_completed: true,
             notifications_enabled: true,
             default_reminder_minutes: 10,
             autostart: false,
+            start_in_tray: false,
             minimize_to_tray: false,
             close_behavior: "exit".into(),
         }
@@ -48,6 +58,7 @@ impl Preferences {
             }
         }
         if !["light", "dark", "system"].contains(&self.theme.as_str())
+            || !(10..=24).contains(&self.calendar_font_size)
             || ![0, 1].contains(&self.first_day)
             || !["month", "week", "week-grid", "year"].contains(&self.default_view.as_str())
             || !["exit", "tray"].contains(&self.close_behavior.as_str())

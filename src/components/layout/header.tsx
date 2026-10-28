@@ -11,7 +11,7 @@ export function Header({ onSettings, firstDay, loading }: { onSettings: () => vo
   return (
     <header className="app-header">
       <Button variant="ghost" size="icon" aria-label={sidebarOpen ? 'Recolher barra lateral' : 'Expandir barra lateral'} aria-expanded={sidebarOpen} aria-controls="sidebar" onClick={toggleSidebar}><Menu /></Button>
-      <div className="brand"><span className="brand-icon"><CalendarCheck2 aria-hidden="true" /></span><span>Todo <strong>Calendar</strong></span></div>
+      <div className="brand"><span className="brand-icon"><CalendarCheck2 aria-hidden="true" /></span><span>Manus <strong>Calendar</strong></span></div>
       <Button variant="outline" className="today-button" onClick={today}>Hoje</Button>
       <div className="flex items-center">
         <Button variant="ghost" size="icon" aria-label={`${period} anterior`} onClick={() => navigate(-1)}><ChevronLeft /></Button>

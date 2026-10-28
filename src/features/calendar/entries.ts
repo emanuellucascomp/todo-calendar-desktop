@@ -1,4 +1,5 @@
 import type { CalendarEntry, Category, EntryKind } from '../../types/calendar';
+import { entryTypography } from './typography.ts';
 import { dateKey, parseCivilDate, type DateRange } from './dates.ts';
 
 export interface CalendarFilters {
@@ -82,6 +83,6 @@ export function calendarEvent(entry: CalendarEntry, categories: Category[]) {
     id: entry.id, title: entry.title, ...interval,
     backgroundColor: color, borderColor: color, textColor: contrastingText(color),
     classNames: entry.completed === 1 ? ['entry-completed'] : [],
-    extendedProps: { kind: entry.kind, completed: entry.completed === 1 },
+    extendedProps: { typography: entryTypography(entry), kind: entry.kind, completed: entry.completed === 1 },
   };
 }

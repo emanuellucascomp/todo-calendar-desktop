@@ -12,6 +12,7 @@ import { EntryEditor } from '@/components/entries/entry-editor';
 import { CategoryManager } from '@/components/entries/category-manager';
 import { usePreferencesStore } from '@/stores/preferences-store';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useSessionClose } from '@/hooks/use-session-close';
 
 export function App() {
   const { state, retry, refreshMetadata, toggleCompleted, saving, saveError } = useFoundation();
@@ -21,6 +22,7 @@ export function App() {
   const editorRequest = useCalendarStore((store) => store.editorRequest);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const ready = state.status === 'ready';
+  const sessionError = useSessionClose(ready);
   const preferences = useCalendarPreferences(ready);
   const appPreferences = usePreferencesStore((store) => store.preferences);
   const preferencesError = usePreferencesStore((store) => store.error);
@@ -42,6 +44,7 @@ export function App() {
             <Button variant="outline" size="sm" className="ml-auto shrink-0" onClick={retry}><RefreshCw /> Tentar novamente</Button>
           </div>}
           {saveError && <p role="alert" className="database-alert">{saveError}</p>}
+          {sessionError && <p role="alert" className="database-alert">{sessionError}</p>}
           {preferencesError && <p role="alert" className="database-alert">{preferencesError}</p>}
           {preferences.error && <div role="alert" className="database-alert">{preferences.error}
             <Button variant="outline" size="sm" onClick={preferences.retry}><RefreshCw /> Tentar salvar</Button>

@@ -36,6 +36,7 @@ export interface CalendarEntry {
   start_utc?: string | null;
   end_utc?: string | null;
   duration_seconds?: number | null;
+  font_size?: number; bold?: boolean; italic?: boolean; underline?: boolean;
 }
 
 export type EditScope = 'one' | 'future' | 'series';
@@ -46,6 +47,7 @@ export interface EntryDraft {
   category_id: string | null; priority: Priority; recurrence_rule: string | null; reminders: ReminderDraft[];
   start_utc?: string | null; end_utc?: string | null;
   duration_seconds?: number | null;
+  font_size?: number; bold?: boolean; italic?: boolean; underline?: boolean;
 }
 export interface EditorRequest { entry?: CalendarEntry; start?: Date; end?: Date; allDay?: boolean }
 

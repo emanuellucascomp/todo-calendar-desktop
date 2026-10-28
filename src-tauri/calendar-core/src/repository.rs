@@ -262,6 +262,7 @@ pub fn new_entry(draft: &EntryDraft) -> Entry {
         updated_at: now(),
         series_end_before: None,
         duration_seconds: None,
+        font_size: 12, bold: false, italic: false, underline: false,
     };
     draft.apply(&mut entry);
     entry
@@ -284,10 +285,11 @@ pub fn draft_from(entry: &Entry, reminders: Vec<ReminderDraft>) -> EntryDraft {
         start_utc: None,
         end_utc: None,
         duration_seconds: entry.duration_seconds,
+        font_size: entry.font_size, bold: entry.bold, italic: entry.italic, underline: entry.underline,
     }
 }
 pub async fn write_entry(tx: &mut Transaction<'_, Sqlite>, entry: &Entry) -> Result<()> {
-    sqlx::query("INSERT INTO calendar_entries(id,kind,title,description,start_date,start_time,end_date,end_time,all_day,timezone,category_id,priority,completed,recurrence_rule,series_parent_id,created_at,updated_at,series_end_before,duration_seconds) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET kind=excluded.kind,title=excluded.title,description=excluded.description,start_date=excluded.start_date,start_time=excluded.start_time,end_date=excluded.end_date,end_time=excluded.end_time,all_day=excluded.all_day,timezone=excluded.timezone,category_id=excluded.category_id,priority=excluded.priority,completed=excluded.completed,recurrence_rule=excluded.recurrence_rule,series_parent_id=excluded.series_parent_id,updated_at=excluded.updated_at,series_end_before=excluded.series_end_before,duration_seconds=excluded.duration_seconds")
-        .bind(&entry.id).bind(&entry.kind).bind(&entry.title).bind(&entry.description).bind(&entry.start_date).bind(&entry.start_time).bind(&entry.end_date).bind(&entry.end_time).bind(entry.all_day).bind(&entry.timezone).bind(&entry.category_id).bind(&entry.priority).bind(entry.completed).bind(&entry.recurrence_rule).bind(&entry.series_parent_id).bind(&entry.created_at).bind(&entry.updated_at).bind(&entry.series_end_before).bind(entry.duration_seconds).execute(&mut **tx).await.map_err(error)?;
+    sqlx::query("INSERT INTO calendar_entries(id,kind,title,description,start_date,start_time,end_date,end_time,all_day,timezone,category_id,priority,completed,recurrence_rule,series_parent_id,created_at,updated_at,series_end_before,duration_seconds,font_size,bold,italic,underline) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET kind=excluded.kind,title=excluded.title,description=excluded.description,start_date=excluded.start_date,start_time=excluded.start_time,end_date=excluded.end_date,end_time=excluded.end_time,all_day=excluded.all_day,timezone=excluded.timezone,category_id=excluded.category_id,priority=excluded.priority,completed=excluded.completed,recurrence_rule=excluded.recurrence_rule,series_parent_id=excluded.series_parent_id,updated_at=excluded.updated_at,series_end_before=excluded.series_end_before,duration_seconds=excluded.duration_seconds,font_size=excluded.font_size,bold=excluded.bold,italic=excluded.italic,underline=excluded.underline")
+        .bind(&entry.id).bind(&entry.kind).bind(&entry.title).bind(&entry.description).bind(&entry.start_date).bind(&entry.start_time).bind(&entry.end_date).bind(&entry.end_time).bind(entry.all_day).bind(&entry.timezone).bind(&entry.category_id).bind(&entry.priority).bind(entry.completed).bind(&entry.recurrence_rule).bind(&entry.series_parent_id).bind(&entry.created_at).bind(&entry.updated_at).bind(&entry.series_end_before).bind(entry.duration_seconds).bind(entry.font_size).bind(entry.bold).bind(entry.italic).bind(entry.underline).execute(&mut **tx).await.map_err(error)?;
     Ok(())
 }

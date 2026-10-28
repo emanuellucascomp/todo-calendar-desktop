@@ -36,6 +36,25 @@ class DatabaseTests(unittest.TestCase):
         finally:
             legacy.close()
 
+    def test_typography_migration_preserves_existing_styles(self):
+        legacy = sqlite3.connect(':memory:')
+        try:
+            files = sorted((ROOT/'src-tauri/migrations').glob('*.sql'))
+            for migration in files[:4]:
+                legacy.executescript(migration.read_text(encoding='utf-8'))
+            legacy.execute("INSERT INTO calendar_entries(id,kind,title,start_date,timezone) VALUES('root','task','Estudar','2026-11-02','UTC')")
+            for key, value in [('calendar_font_size','20'),('calendar_bold','true'),('calendar_italic','true'),('calendar_underline','true')]:
+                legacy.execute('INSERT INTO app_settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value', (key,value))
+            legacy.execute("INSERT INTO recurrence_exceptions(id,entry_id,original_start,exception_type,overrides_json) VALUES('ex','root','2026-11-03','override','{}')")
+            legacy.executescript(files[4].read_text(encoding='utf-8'))
+            self.assertEqual(legacy.execute("SELECT font_size,bold,italic,underline FROM calendar_entries").fetchone(),(20,1,1,1))
+            patch = json.loads(legacy.execute('SELECT overrides_json FROM recurrence_exceptions').fetchone()[0])
+            self.assertEqual(patch,dict(font_size=20,bold=True,italic=True,underline=True))
+            legacy.execute("INSERT INTO calendar_entries(id,kind,title,start_date,timezone) VALUES('new','task','Novo','2026-11-02','UTC')")
+            self.assertEqual(legacy.execute("SELECT font_size,bold,italic,underline FROM calendar_entries WHERE id='new'").fetchone(),(12,0,0,0))
+        finally:
+            legacy.close()
+
     def setUp(self):
         directory = ROOT / '.test-data'
         directory.mkdir(exist_ok=True)

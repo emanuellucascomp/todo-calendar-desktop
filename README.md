@@ -1,10 +1,14 @@
-# Todo Calendar
+# Manus Calendar
+
+Nas visões mensal e semanais, arraste um evento ou tarefa para mudar sua data ou horário. Em séries recorrentes, essa ação move somente a ocorrência arrastada. Para editar pelo teclado ou alterar toda a série, use o formulário de edição. A semana em grade exibe também o dia do mês em cada cabeçalho.
+
+Em **Configurações → Aparência**, escolha o tamanho dos textos dos eventos (10–24 px) e combine negrito, itálico e sublinhado. Essas preferências ficam salvas no SQLite local.
 
 Calendário pessoal offline para Windows 10 e Windows 11, feito com Tauri 2, Rust, React e TypeScript. Tarefas e eventos compartilham as visões Semana, Mês e Ano. A interface usa português brasileiro, relógio de 24 horas, fontes locais e SQLite por usuário. Não há conta, backend HTTP, telemetria ou atualização automática remota.
 
 ## Motivação
 
-O Todo Calendar nasceu de uma necessidade da minha esposa. Os aplicativos de tarefas que ela encontrava exibiam tantas informações que acabavam tirando o foco do que ela precisava fazer. Ela queria um aplicativo minimalista, com apenas o essencial e pouquíssima customização — no máximo, mudar as cores.
+O Manus Calendar nasceu de uma necessidade da minha esposa. Os aplicativos de tarefas que ela encontrava exibiam tantas informações que acabavam tirando o foco do que ela precisava fazer. Ela queria um aplicativo minimalista, com apenas o essencial e pouquíssima customização — no máximo, mudar as cores.
 
 Essa necessidade motivou o projeto e orienta sua proposta: ajudar a organizar tarefas e compromissos com uma interface simples, sem excesso de informações ou opções.
 
@@ -79,7 +83,9 @@ O agendador vive no Rust e verifica o banco a cada 15 segundos, além de ser aco
 
 A entrega é reservada atomicamente no SQLite antes de chamar o plugin Notification. Entregas confirmadas não são repetidas, nem ao restaurar um backup mais antigo sobre o mesmo histórico. Falhas conhecidas têm até três tentativas. Uma interrupção entre a reserva e a confirmação é conservada como entrega incerta e não é reenviada automaticamente; isso prioriza evitar duplicações, podendo perder um aviso nesse caso raro. O Windows ainda pode suprimir avisos conforme suas configurações.
 
-**O aplicativo totalmente encerrado não emite notificações.** Não há serviço Windows, tarefa agendada ou agendamento independente do processo. Mantenha-o na bandeja ou ative a inicialização com o Windows. O menu da bandeja permite abrir e encerrar completamente. A opção de autostart só altera o Windows quando o usuário a salva; iniciar por ela passa `--tray` e mantém a janela oculta.
+**O aplicativo totalmente encerrado não emite notificações.** Não há serviço Windows, tarefa agendada ou agendamento independente do processo. Mantenha-o na bandeja ou ative a inicialização com o Windows. O menu da bandeja permite abrir e encerrar completamente. A opção de autostart só altera o Windows quando o usuário a salva; iniciar por ela passa `--autostart` e abre a janela por padrão. Para abrir o calendário ao entrar na conta, ative **Configurações → Sistema → Iniciar Manus Calendar com o Windows** e deixe **Iniciar minimizado na bandeja** desmarcado. A inicialização automática continua desativada por padrão.
+
+Ao reabrir, o aplicativo restaura a data civil selecionada, a visualização, os filtros de tipos e categorias, a barra lateral e o modo minimalista. Aparência e exibição de tarefas concluídas também permanecem salvas. A janela recupera tamanho, posição e estado maximizado; se o monitor anterior não estiver disponível, ela volta para uma posição acessível. A sessão e a geometria ficam na tabela SQLite de configurações, sem novo banco ou migration. Fechar a janela ou encerrar pela bandeja aguarda a gravação da sessão. Desligamentos abruptos podem interromper gravações pendentes.
 
 O teste de notificação está nas configurações. No Windows, o [plugin oficial de notificações](https://v2.tauri.app/plugin/notification/) exige considerar a instalação do aplicativo para o teste real; não trate um teste no navegador como confirmação de entrega nativa.
 
@@ -150,7 +156,7 @@ cargo fetch --manifest-path src-tauri/Cargo.toml
 npm.cmd run desktop:build
 ```
 
-O Tauri executa o typecheck/build do frontend e compila o aplicativo nativo. A configuração solicita instalador **NSIS** em português brasileiro, nome **Todo Calendar**, identificador `br.com.todocalendar.desktop` e ícone original. O instalador deve aparecer em `src-tauri/target/release/bundle/nsis/`. Essa saída ainda não foi produzida neste ambiente. Veja a [documentação de instaladores Windows](https://v2.tauri.app/distribute/windows-installer/).
+O Tauri executa o typecheck/build do frontend e compila o aplicativo nativo. A configuração solicita instalador **NSIS** em português brasileiro, nome **Manus Calendar**, identificador `br.com.todocalendar.desktop` e ícone original. O instalador deve aparecer em `src-tauri/target/release/bundle/nsis/`. Essa saída ainda não foi produzida neste ambiente. Veja a [documentação de instaladores Windows](https://v2.tauri.app/distribute/windows-installer/).
 
 Os ícones PNG/ICO são reproduzíveis com `python scripts/generate-icon.py`. Não há assinatura de produção nem atualização automática remota configurada.
 

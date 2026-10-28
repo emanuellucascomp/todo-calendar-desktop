@@ -53,7 +53,7 @@ impl Backup {
         Ok(backup)
     }
     pub fn validate(&self) -> Result<()> {
-        if self.format != "todo-calendar" || self.version != 1 || self.schema_version != 4 {
+        if self.format != "todo-calendar" || self.version != 1 || ![4, 5].contains(&self.schema_version) {
             return Err("Formato ou versão de backup incompatível.".into());
         }
         if self.entries.len() > 100_000
@@ -260,7 +260,7 @@ impl Repository {
         Ok(Backup {
             format: "todo-calendar".into(),
             version: 1,
-            schema_version: 4,
+            schema_version: 5,
             exported_at: now(),
             categories,
             entries,

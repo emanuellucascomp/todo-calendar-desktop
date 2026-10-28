@@ -4,6 +4,7 @@ import { ptBR } from 'date-fns/locale';
 import { CalendarDays, CalendarRange, Square, SquareCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { entryTypography } from '@/features/calendar/typography';
 import { entryInterval } from '@/features/calendar/entries';
 import type { CalendarEntry, Category } from '@/types/calendar';
 import { useCalendarStore } from '@/stores/calendar-store';
@@ -56,7 +57,7 @@ export function SelectionDialog({ selection, onClose, entries, categories, loadi
             const category = categories.find((item) => item.id === entry.category_id);
             const interval = entryInterval(entry);
             return <article key={entry.id} className="context-entry" style={{ borderLeftColor: category?.color ?? '#1A73E8' }}>
-              <h3 className={entry.completed ? 'line-through' : ''}>
+              <h3 style={entryTypography(entry)}>
                 {entry.kind === 'event' ? <CalendarDays /> : entry.completed ? <SquareCheck /> : <Square />}{entry.title}
               </h3>
               <p>{entry.kind === 'task' ? entry.completed ? 'Tarefa concluída' : 'Tarefa pendente' : 'Evento'}{category ? ` · ${category.name}` : ''}</p>

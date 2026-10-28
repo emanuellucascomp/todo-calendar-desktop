@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useCalendarStore } from '@/stores/calendar-store';
 import { saveLastView } from '@/services/settings-repository';
+import { saveSession } from '@/services/session-repository';
 
 export function useCalendarPreferences(ready: boolean) {
   const view = useCalendarStore((state) => state.view);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!ready) return;
+    return useCalendarStore.subscribe((state, previous) => {
+      if (state.view === previous.view && state.selectedDate === previous.selectedDate && state.sidebarOpen === previous.sidebarOpen
+        && state.minimalMode === previous.minimalMode && state.visibleKinds === previous.visibleKinds
+        && state.hiddenCategoryIds === previous.hiddenCategoryIds) return;
+      void saveSession().catch(() => setError('Não foi possível salvar a última sessão.'));
+    });
+  }, [ready, attempt]);
 
   useEffect(() => {
     if (!ready) return;

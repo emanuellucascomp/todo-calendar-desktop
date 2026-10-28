@@ -22,11 +22,13 @@ pub struct RuntimeState {
     pub wake: tokio::sync::Notify,
     pub close_to_tray: AtomicBool,
     pub minimize_to_tray: AtomicBool,
+    pub start_in_tray: AtomicBool,
     pub status: Mutex<RuntimeStatus>,
     pub pending_backup: Mutex<Option<(String, todo_calendar_core::backup::Backup)>>,
 }
 pub fn apply(app: &tauri::AppHandle, preferences: &Preferences) {
     let state = app.state::<RuntimeState>();
+    state.start_in_tray.store(preferences.start_in_tray, Ordering::Relaxed);
     state
         .close_to_tray
         .store(preferences.close_behavior == "tray", Ordering::Relaxed);
@@ -131,7 +133,7 @@ pub async fn save_settings(app: tauri::AppHandle, preferences: Preferences) -> R
 pub fn test_notification(app: tauri::AppHandle) -> Result<()> {
     app.notification()
         .builder()
-        .title("Todo Calendar")
+        .title("Manus Calendar")
         .body("Tudo pronto! Seus lembretes aparecerão aqui enquanto o aplicativo estiver ativo.")
         .show()
         .map_err(error)

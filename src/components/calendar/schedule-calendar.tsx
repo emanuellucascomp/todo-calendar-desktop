@@ -15,10 +15,11 @@ interface Props {
   categories: Category[];
   onSelect: (selection: CalendarSelection) => void;
   onToggle: (entry: CalendarEntry) => void;
+  onMove: (entry: CalendarEntry, start: Date, end: Date | null, allDay: boolean) => Promise<void>;
   saving: boolean;
 }
 
-export function ScheduleCalendar({ firstDay, entries, categories, onSelect, onToggle, saving }: Props) {
+export function ScheduleCalendar({ firstDay, entries, categories, onSelect, onToggle, onMove, saving }: Props) {
   const ref = useRef<FullCalendar>(null);
   const container = useRef<HTMLDivElement>(null);
   const date = useCalendarStore((state) => state.selectedDate);
@@ -65,10 +66,10 @@ export function ScheduleCalendar({ firstDay, entries, categories, onSelect, onTo
     slotDuration="00:30:00" slotLabelInterval="01:00:00" scrollTime="07:00:00" scrollTimeReset={false}
     slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
     eventTimeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
-    displayEventEnd eventDisplay="block" events={events} editable={false} eventInteractive
+    displayEventEnd eventDisplay="block" events={events} eventStartEditable={!saving} eventDurationEditable={false} eventInteractive
     views={{
       dayGridMonth: { fixedWeekCount: true, dayHeaderFormat: { weekday: 'short' }, dayMaxEvents: 3 },
-      dayGridWeek: { fixedWeekCount: false, dayHeaderFormat: { weekday: 'long' }, dayMaxEvents: true },
+      dayGridWeek: { fixedWeekCount: false, dayHeaderFormat: { weekday: 'long', day: '2-digit' }, dayMaxEvents: true },
       timeGridWeek: { dayHeaderFormat: { weekday: 'short', day: '2-digit', month: '2-digit' }, dayMaxEvents: false },
     }}
     moreLinkClick="popover" moreLinkText={(count) => `+${count} mais`}
@@ -80,20 +81,25 @@ export function ScheduleCalendar({ firstDay, entries, categories, onSelect, onTo
       onSelect({ start: info.start, end: info.end, allDay: info.allDay });
       ref.current?.getApi().unselect();
     }}
+    eventDrop={(info) => {
+      const entry = entries.find((entry) => entry.id === info.event.id);
+      if (!entry || !info.event.start || saving) { info.revert(); return; }
+      void onMove(entry, info.event.start, info.event.end, info.event.allDay).catch(() => info.revert());
+    }}
     eventClick={(info) => {
       info.jsEvent.preventDefault();
       if (info.event.start && info.event.end) onSelect({
         start: info.event.start, end: info.event.end, allDay: info.event.allDay, entryId: info.event.id,
       });
     }}
-    eventContent={(info) => <span className="calendar-entry-content">
+    eventContent={(info) => <span className="calendar-entry-content" style={info.event.extendedProps.typography}>
       {info.event.extendedProps.kind === 'task' && <input type="checkbox" checked={Boolean(info.event.extendedProps.completed)} disabled={saving}
         aria-label={`${info.event.extendedProps.completed ? 'Reabrir' : 'Concluir'} ${info.event.title}`}
         onClick={(event) => event.stopPropagation()} onMouseDown={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}
         onKeyDown={(event) => event.stopPropagation()}
         onChange={() => { const entry = entries.find((entry) => entry.id === info.event.id); if (entry) onToggle(entry); }} />}
       {info.timeText && <span className="calendar-entry-time">{info.timeText}</span>}
-      <span className="calendar-entry-title">{info.event.title}</span>
+      <span className="calendar-entry-title" style={{ textDecoration: info.event.extendedProps.typography.textDecoration }}>{info.event.title}</span>
     </span>}
     eventDidMount={(info) => {
       info.el.setAttribute('aria-label', `${info.event.title}, ${info.event.extendedProps.kind === 'task'

@@ -6,7 +6,7 @@ let connection: Promise<Database> | undefined;
 
 export function getDatabase(): Promise<Database> {
   if (!isTauri()) {
-    return Promise.reject(new Error('O SQLite está disponível no aplicativo desktop. Abra o Todo Calendar com o Tauri.'));
+    return Promise.reject(new Error('O SQLite está disponível no aplicativo desktop. Abra o Manus Calendar com o Tauri.'));
   }
   connection ??= connect().catch((error: unknown) => {
     connection = undefined;

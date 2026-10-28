@@ -15,7 +15,7 @@ pub fn show(app: &tauri::AppHandle) {
 }
 pub fn install(app: &tauri::AppHandle) -> Result<()> {
     let open =
-        MenuItem::with_id(app, "open", "Abrir Todo Calendar", true, None::<&str>).map_err(error)?;
+        MenuItem::with_id(app, "open", "Abrir Manus Calendar", true, None::<&str>).map_err(error)?;
     let quit = MenuItem::with_id(app, "quit", "Encerrar completamente", true, None::<&str>)
         .map_err(error)?;
     let menu = Menu::with_items(app, &[&open, &quit]).map_err(error)?;
@@ -25,12 +25,12 @@ pub fn install(app: &tauri::AppHandle) -> Result<()> {
         .clone();
     TrayIconBuilder::with_id("todo-calendar")
         .icon(icon)
-        .tooltip("Todo Calendar")
+        .tooltip("Manus Calendar")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "open" => show(app),
-            "quit" => app.exit(0),
+            "quit" => crate::window_session::quit(app),
             _ => {}
         })
         .on_tray_icon_event(|tray, event| {
@@ -54,6 +54,9 @@ pub fn window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
     let runtime = app.state::<crate::runtime::RuntimeState>();
     match event {
         tauri::WindowEvent::CloseRequested { api, .. }
+            if crate::window_session::intercept_close(window, api) => {}
+        tauri::WindowEvent::Moved(_) => crate::window_session::changed(window),
+        tauri::WindowEvent::CloseRequested { api, .. }
             if runtime.close_to_tray.load(Ordering::Relaxed) =>
         {
             api.prevent_close();
@@ -66,6 +69,7 @@ pub fn window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
             let _ = window.hide();
         }
         tauri::WindowEvent::Focused(true) => runtime.wake.notify_one(),
+        tauri::WindowEvent::Resized(_) => crate::window_session::changed(window),
         _ => {}
     }
 }

@@ -62,6 +62,14 @@ export function EntryEditor({ request, categories, defaultReminder }: { request:
         </div>
         <label className="form-field">Título<input autoFocus maxLength={300} {...register('title')} placeholder="Adicionar título" aria-invalid={!!errors.title} /><FieldError message={errors.title?.message} /></label>
         <label className="form-field">Descrição<textarea rows={3} {...register('description')} placeholder="Adicionar uma descrição" /><FieldError message={errors.description?.message} /></label>
+        <section className="form-section"><h3>Fonte deste registro</h3>
+          <label className="form-field">Tamanho da fonte (px)<input type="number" min={10} max={24} aria-invalid={!!errors.font_size} {...register('font_size', { valueAsNumber: true })} /><FieldError message={errors.font_size?.message} /></label>
+          <label className="form-check"><input type="checkbox" {...register('bold')} /> Negrito</label>
+          <label className="form-check"><input type="checkbox" {...register('italic')} /> Itálico</label>
+          <label className="form-check"><input type="checkbox" {...register('underline')} /> Sublinhado</label>
+          <p className="field-help">A formatação é salva somente neste registro, conforme o alcance escolhido para a repetição.</p>
+          <p style={{ fontSize: `${values.font_size >= 10 && values.font_size <= 24 ? values.font_size : 12}px`, fontWeight: values.bold ? 700 : 400, fontStyle: values.italic ? 'italic' : 'normal', textDecoration: values.underline ? 'underline' : 'none' }}>Prévia: {values.title || 'Título do registro'}</p>
+        </section>
         <label className="form-check"><input type="checkbox" {...register('allDay')} onChange={(event) => {
           setValue('allDay',event.target.checked);
           if (!event.target.checked && values.kind === 'event') {setValue('startTime',values.startTime||'09:00');setValue('endTime',values.endTime||'10:00');}

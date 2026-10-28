@@ -21,6 +21,8 @@ function untilDate(rule:string|undefined,timezone:string):string {
   return `${rule.slice(0,4)}-${rule.slice(4,6)}-${rule.slice(6,8)}`;
 }
 export const entryFormSchema = z.object({
+  font_size: z.number().int().min(10, 'Use pelo menos 10 px.').max(24, 'Use at? 24 px.'),
+  bold: z.boolean(), italic: z.boolean(), underline: z.boolean(),
   kind: z.enum(['task', 'event']), title: z.string().trim().min(1, 'Informe um título.').max(300, 'Use até 300 caracteres.'),
   description: z.string().max(100_000, 'Descrição muito longa.'), startDate: z.string().refine(validDate, 'Informe uma data válida.'),
   startTime: z.string(), endDate: z.string(), endTime: z.string(), allDay: z.boolean(),
@@ -76,6 +78,7 @@ export function toEntryDraft(values: EntryFormValues, timezone: string, individu
   let endDate = values.endDate || (values.endTime && !allDay ? values.startDate : null);
   if (allDay && endDate) { const date = parseCivilDate(endDate); date.setDate(date.getDate() + 1); endDate = dateKey(date); }
   return {
+    font_size: values.font_size, bold: values.bold, italic: values.italic, underline: values.underline,
     kind: values.kind, title: values.title.trim(), description: values.description, start_date: values.startDate,
     start_time: allDay ? null : values.startTime || null, end_date: endDate, end_time: allDay ? null : values.endTime || null,
     all_day: allDay, timezone, category_id: values.categoryId || null, priority: values.priority,
@@ -97,6 +100,7 @@ export function formDefaults(request: EditorRequest, reminders: ReminderDraft[] 
   const rule = Object.fromEntries((entry?.recurrence_rule ?? '').split(';').filter(Boolean).map((part) => part.split('=')));
   const asLocalInput = (instant: string) => { const at = new Date(instant); return `${dateKey(at)}T${at.getHours().toString().padStart(2,'0')}:${at.getMinutes().toString().padStart(2,'0')}`; };
   const values:EntryFormValues = {
+    font_size: entry?.font_size ?? 12, bold: entry?.bold ?? false, italic: entry?.italic ?? false, underline: entry?.underline ?? false,
     kind: entry?.kind ?? 'task', title: entry?.title ?? '', description: entry?.description ?? '', startDate: entry?.start_date ?? dateKey(start),
     startTime: entry?.start_time ?? (allDay ? '' : `${start.getHours().toString().padStart(2,'0')}:${start.getMinutes().toString().padStart(2,'0')}`),
     endDate, endTime: entry?.end_time ?? (end && !allDay ? `${end.getHours().toString().padStart(2,'0')}:${end.getMinutes().toString().padStart(2,'0')}` : ''), allDay,

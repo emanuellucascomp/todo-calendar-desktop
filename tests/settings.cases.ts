@@ -10,6 +10,6 @@ export const settingsCases: {name:string;run:()=>void}[] = [
     }
   }},
   {name:'preferências começam com autostart desativado e tema do sistema',run(){const settings=preferencesSchema.parse(DEFAULT_PREFERENCES);assert.equal(settings.autostart,false);assert.equal(settings.theme,'system');}},
-  {name:'configurações rejeitam primeiro dia, tema e antecedência inválidos',run(){for(const change of [{first_day:7},{theme:'unknown'},{default_reminder_minutes:-1}])assert.equal(preferencesSchema.safeParse({...DEFAULT_PREFERENCES,...change}).success,false);}},
+  {name:'configurações rejeitam primeiro dia, tema e antecedência inválidos',run(){for(const change of [{calendar_font_size:9},{calendar_font_size:25},{calendar_font_size:12.5},{calendar_bold:'true'},{first_day:7},{theme:'unknown'},{default_reminder_minutes:-1}])assert.equal(preferencesSchema.safeParse({...DEFAULT_PREFERENCES,...change}).success,false);}},
   {name:'configurações aceitam tema escuro, segunda-feira e fechamento na bandeja',run(){const settings=preferencesSchema.parse({...DEFAULT_PREFERENCES,theme:'dark',first_day:1,close_behavior:'tray'});assert.equal(settings.first_day,1);assert.equal(settings.close_behavior,'tray');}},
 ];
